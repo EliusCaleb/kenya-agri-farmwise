@@ -64,7 +64,7 @@ const DashboardHome = () => {
   }
 
   const userRole = profile?.role || 'farmer';
-  const userName = profile?.full_name?.split(' ')[0] || 'there';
+  const userName = profile?.full_name?.split(' ')[0] || 'User';
   const isBuyer = userRole === 'buyer';
   const quickActions = isBuyer ? buyerQuickActions : farmerQuickActions;
   const stats = isBuyer ? buyerStats : farmerStats;

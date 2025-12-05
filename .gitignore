@@ -24,17 +24,8 @@ build/
 
 # OS
 .DS_Store
-Thumbs.db
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-env/
-
-# Temporary files
-*.tmp
-.cache/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

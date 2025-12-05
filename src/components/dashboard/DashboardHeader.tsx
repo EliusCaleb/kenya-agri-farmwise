@@ -1,12 +1,24 @@
 import { Bell, Menu, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useUserProfile } from '@/hooks/use-user-profile';
 
 interface DashboardHeaderProps {
   onMenuClick: () => void;
 }
 
 const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
+  const { profile } = useUserProfile();
+
+  const displayName = profile?.full_name || 'User';
+  const displayRole = profile?.role ? (profile.role.charAt(0).toUpperCase() + profile.role.slice(1)) : 'Member';
+  const initials = displayName
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
+
   return (
     <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border">
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
@@ -18,7 +30,7 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           >
             <Menu className="w-6 h-6" />
           </button>
-          
+
           {/* Search Bar */}
           <div className="hidden md:flex relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -42,11 +54,11 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           {/* User Avatar */}
           <div className="flex items-center gap-3">
             <div className="hidden sm:block text-right">
-              <p className="text-sm font-medium text-foreground">John Kamau</p>
-              <p className="text-xs text-muted-foreground">Farmer</p>
+              <p className="text-sm font-medium text-foreground">{displayName}</p>
+              <p className="text-xs text-muted-foreground">{displayRole}</p>
             </div>
             <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground font-medium">
-              JK
+              {initials}
             </div>
           </div>
         </div>

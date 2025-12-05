@@ -1,11 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Leaf, LayoutDashboard, Scan, TrendingUp, ShoppingBag, 
+import {
+  Leaf, LayoutDashboard, Scan, TrendingUp, ShoppingBag,
   CloudSun, MessageSquare, Settings, LogOut, X, Store
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
+import { useUserProfile } from '@/hooks/use-user-profile';
 
 const farmerMenuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -32,20 +31,9 @@ interface DashboardSidebarProps {
 
 const DashboardSidebar = ({ isOpen, setIsOpen }: DashboardSidebarProps) => {
   const location = useLocation();
-  const [userRole, setUserRole] = useState<'farmer' | 'buyer' | null>(null);
+  const { profile } = useUserProfile();
 
-  useEffect(() => {
-    const getUserRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.user_metadata?.role) {
-        setUserRole(user.user_metadata.role as 'farmer' | 'buyer');
-      } else {
-        setUserRole('farmer'); // Default to farmer if no role
-      }
-    };
-    getUserRole();
-  }, []);
-
+  const userRole = profile?.role || 'farmer';
   const menuItems = userRole === 'buyer' ? buyerMenuItems : farmerMenuItems;
 
   return (
@@ -83,18 +71,16 @@ const DashboardSidebar = ({ isOpen, setIsOpen }: DashboardSidebarProps) => {
           </div>
 
           {/* Role Badge */}
-          {userRole && (
-            <div className="px-4 pt-4">
-              <span className={cn(
-                "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
-                userRole === 'buyer' 
-                  ? "bg-accent/20 text-accent" 
-                  : "bg-secondary/20 text-secondary"
-              )}>
-                {userRole === 'buyer' ? '🛒 Buyer Account' : '🌾 Farmer Account'}
-              </span>
-            </div>
-          )}
+          <div className="px-4 pt-4">
+            <span className={cn(
+              "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
+              userRole === 'buyer'
+                ? "bg-accent/20 text-accent"
+                : "bg-secondary/20 text-secondary"
+            )}>
+              {userRole === 'buyer' ? '🛒 Buyer Account' : '🌾 Farmer Account'}
+            </span>
+          </div>
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
