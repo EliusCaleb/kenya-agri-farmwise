@@ -1,17 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Bell, Globe, Shield, HelpCircle, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { useUserProfile } from '@/hooks/use-user-profile';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Settings = () => {
-  const [profile, setProfile] = useState({
-    name: 'John Kamau',
-    email: 'john.kamau@example.com',
-    phone: '+254 700 123 456',
-    county: 'Nakuru',
-    farmSize: '5',
+  const { profile: userProfile, loading, updateProfile } = useUserProfile();
+  const { toast } = useToast();
+  const [userEmail, setUserEmail] = useState('');
+
+  const [formData, setFormData] = useState({
+    full_name: '',
+    phone: '',
+    county: '',
+    bio: '',
   });
 
   const [notifications, setNotifications] = useState({
@@ -20,6 +26,54 @@ const Settings = () => {
     newMessages: true,
     marketUpdates: false,
   });
+
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const getUserEmail = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) setUserEmail(user.email);
+    };
+    getUserEmail();
+  }, []);
+
+  useEffect(() => {
+    if (userProfile) {
+      setFormData({
+        full_name: userProfile.full_name || '',
+        phone: userProfile.phone || '',
+        county: userProfile.county || '',
+        bio: userProfile.bio || '',
+      });
+    }
+  }, [userProfile]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    const { error } = await updateProfile(formData);
+
+    if (error) {
+      toast({
+        title: 'Error updating profile',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } else {
+      toast({
+        title: 'Profile updated',
+        description: 'Your changes have been saved successfully.',
+      });
+    }
+    setSaving(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
@@ -39,20 +93,20 @@ const Settings = () => {
           <User className="w-5 h-5" />
           Profile Information
         </h2>
-        
+
         {/* Avatar */}
         <div className="flex items-center gap-4 mb-6">
           <div className="relative">
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center text-2xl font-bold text-foreground">
-              JK
+              {formData.full_name?.charAt(0) || 'U'}
             </div>
             <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors">
               <Camera className="w-4 h-4" />
             </button>
           </div>
           <div>
-            <p className="font-medium text-foreground">{profile.name}</p>
-            <p className="text-sm text-muted-foreground">Farmer • Member since Jan 2024</p>
+            <p className="font-medium text-foreground">{formData.full_name || 'User'}</p>
+            <p className="text-sm text-muted-foreground">{userProfile?.role === 'buyer' ? 'Buyer' : 'Farmer'}</p>
           </div>
         </div>
 
@@ -61,8 +115,8 @@ const Settings = () => {
             <Label htmlFor="name">Full Name</Label>
             <Input
               id="name"
-              value={profile.name}
-              onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+              value={formData.full_name}
+              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
             />
           </div>
           <div className="space-y-2">
@@ -70,39 +124,36 @@ const Settings = () => {
             <Input
               id="email"
               type="email"
-              value={profile.email}
-              onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+              value={userEmail}
+              disabled
+              className="bg-muted"
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">Phone Number</Label>
             <Input
               id="phone"
-              value={profile.phone}
-              onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="county">County</Label>
             <Input
               id="county"
-              value={profile.county}
-              onChange={(e) => setProfile({ ...profile, county: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="farmSize">Farm Size (acres)</Label>
-            <Input
-              id="farmSize"
-              type="number"
-              value={profile.farmSize}
-              onChange={(e) => setProfile({ ...profile, farmSize: e.target.value })}
+              value={formData.county}
+              onChange={(e) => setFormData({ ...formData, county: e.target.value })}
             />
           </div>
         </div>
 
-        <Button variant="accent" className="mt-6">
-          Save Changes
+        <Button
+          variant="accent"
+          className="mt-6"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
 
@@ -112,7 +163,7 @@ const Settings = () => {
           <Bell className="w-5 h-5" />
           Notification Preferences
         </h2>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between py-2">
             <div>
@@ -124,7 +175,7 @@ const Settings = () => {
               onCheckedChange={(checked) => setNotifications({ ...notifications, priceAlerts: checked })}
             />
           </div>
-          
+
           <div className="flex items-center justify-between py-2 border-t border-border">
             <div>
               <p className="font-medium text-foreground">Weather Alerts</p>
@@ -135,7 +186,7 @@ const Settings = () => {
               onCheckedChange={(checked) => setNotifications({ ...notifications, weatherAlerts: checked })}
             />
           </div>
-          
+
           <div className="flex items-center justify-between py-2 border-t border-border">
             <div>
               <p className="font-medium text-foreground">New Messages</p>
@@ -146,7 +197,7 @@ const Settings = () => {
               onCheckedChange={(checked) => setNotifications({ ...notifications, newMessages: checked })}
             />
           </div>
-          
+
           <div className="flex items-center justify-between py-2 border-t border-border">
             <div>
               <p className="font-medium text-foreground">Market Updates</p>
