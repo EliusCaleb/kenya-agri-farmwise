@@ -83,10 +83,13 @@ const DashboardSidebar = ({ isOpen, setIsOpen }: DashboardSidebarProps) => {
 
           {/* Footer */}
           <div className="p-4 border-t border-sidebar-border">
-            <button className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors">
+            <Link
+              to="/logout"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+            >
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Sign Out</span>
-            </button>
+            </Link>
           </div>
         </div>
       </aside>
