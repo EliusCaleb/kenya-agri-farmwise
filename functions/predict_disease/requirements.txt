@@ -1,0 +1,6 @@
+google-cloud-aiplatform
+google-cloud-storage
+Pillow
+flask
+gunicorn
+tensorflow==2.15.0
