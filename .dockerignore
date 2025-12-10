@@ -1,0 +1,47 @@
+# Ignore node_modules
+node_modules/
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore environment files
+.env
+.env.local
+.env.*.local
+
+# Ignore IDE files
+.vscode/
+.idea/
+
+# Ignore build artifacts (we'll build in Docker)
+# dist/  # Don't ignore dist - we need it for simple build
+
+# Ignore logs
+*.log
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore documentation
+*.md
+!README.md
+
+# Ignore test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+
+# Ignore CI/CD
+.github/
+
+# Ignore ML and functions (not needed for frontend)
+ml/
+functions/
+supabase/
+
+# Ignore deployment scripts
+setup_gcp.sh
+setup_gcp.ps1
+deploy.sh

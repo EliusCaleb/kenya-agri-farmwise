@@ -1,0 +1,64 @@
+{
+	"Tomato_Late_blight": {
+		"name": "Tomato Late Blight",
+		"severity": "High",
+		"symptoms": [
+			"Water-soaked spots on leaves",
+			"White fungal growth on undersides",
+			"Brown lesions on stems",
+			"Fruit rot"
+		],
+		"treatment": [
+			"Apply copper-based fungicides",
+			"Remove infected plant parts",
+			"Improve air circulation",
+			"Avoid overhead irrigation"
+		],
+		"prevention": [
+			"Use disease-resistant varieties",
+			"Proper spacing between plants",
+			"Mulching to prevent soil splash"
+		]
+	},
+	"Corn_Common_rust": {
+		"name": "Maize Common Rust",
+		"severity": "Medium",
+		"symptoms": [
+			"Small, circular to elongate brown pustules",
+			"Pustules on both leaf surfaces",
+			"Premature leaf death",
+			"Reduced yield"
+		],
+		"treatment": [
+			"Apply fungicides if severe",
+			"Remove heavily infected leaves",
+			"Ensure proper plant nutrition"
+		],
+		"prevention": [
+			"Plant resistant hybrids",
+			"Crop rotation",
+			"Proper field sanitation"
+		]
+	},
+	"Potato_Late_blight": {
+		"name": "Potato Late Blight",
+		"severity": "High",
+		"symptoms": [
+			"Dark brown to black lesions on leaves",
+			"White mold on leaf undersides",
+			"Stem lesions",
+			"Tuber rot"
+		],
+		"treatment": [
+			"Apply fungicides preventively",
+			"Remove and destroy infected plants",
+			"Improve drainage",
+			"Avoid wet foliage"
+		],
+		"prevention": [
+			"Use certified disease-free seed potatoes",
+			"Proper crop rotation",
+			"Hill potatoes properly"
+		]
+	}
+}
