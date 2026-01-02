@@ -1,34 +1,118 @@
 import { useState, useRef } from 'react';
 import { Upload, Camera, X, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { mockDiseases } from '@/lib/mockData';
+import { diseaseDetectionService, type DiseaseResult } from '@/services/diseaseDetection';
+import { useToast } from '@/hooks/use-toast';
 
 const DiseaseDetection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [result, setResult] = useState<typeof mockDiseases[0] | null>(null);
+  const [result, setResult] = useState<DiseaseResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: 'Invalid File',
+          description: 'Please select an image file (PNG, JPG, or WEBP)',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: 'File Too Large',
+          description: 'Please select an image smaller than 10MB',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedImage(reader.result as string);
+        setSelectedFile(file);
         setResult(null);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    if (!selectedFile) {
+      toast({
+        title: 'No Image Selected',
+        description: 'Please select an image first',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Check if API is configured
+    if (!diseaseDetectionService.isConfigured()) {
+      toast({
+        title: 'API Not Configured',
+        description: 'Disease detection API is not configured. Using mock data for demonstration.',
+        variant: 'destructive',
+      });
+
+      // Fall back to mock data
+      setIsAnalyzing(true);
+      setTimeout(() => {
+        setResult({
+          disease: 'Tomato Late Blight',
+          confidence: 89,
+          severity: 'High',
+          symptoms: [
+            'Water-soaked spots on leaves',
+            'White fungal growth on undersides',
+            'Brown lesions on stems',
+            'Fruit rot'
+          ],
+          treatment: [
+            'Apply copper-based fungicides',
+            'Remove infected plant parts',
+            'Improve air circulation',
+            'Avoid overhead irrigation'
+          ],
+          prevention: [
+            'Use disease-resistant varieties',
+            'Proper spacing between plants',
+            'Mulching to prevent soil splash'
+          ]
+        });
+        setIsAnalyzing(false);
+      }, 2500);
+      return;
+    }
+
     setIsAnalyzing(true);
-    // Simulate AI analysis - Replace with actual API call
-    setTimeout(() => {
-      const randomDisease = mockDiseases[Math.floor(Math.random() * mockDiseases.length)];
-      setResult(randomDisease);
+
+    try {
+      const prediction = await diseaseDetectionService.predictDisease(selectedFile);
+      setResult(prediction);
+
+      toast({
+        title: 'Analysis Complete',
+        description: `Detected: ${prediction.disease} (${prediction.confidence}% confidence)`,
+      });
+    } catch (error) {
+      console.error('Disease detection error:', error);
+      toast({
+        title: 'Analysis Failed',
+        description: error instanceof Error ? error.message : 'An error occurred during analysis',
+        variant: 'destructive',
+      });
+    } finally {
       setIsAnalyzing(false);
-    }, 2500);
+    }
   };
 
   const clearImage = () => {
@@ -66,7 +150,7 @@ const DiseaseDetection = () => {
         {/* Upload Section */}
         <div className="bg-card rounded-2xl border border-border p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Upload Image</h2>
-          
+
           {!selectedImage ? (
             <div
               onClick={() => fileInputRef.current?.click()}
@@ -148,7 +232,7 @@ const DiseaseDetection = () => {
         {/* Results Section */}
         <div className="bg-card rounded-2xl border border-border p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Analysis Results</h2>
-          
+
           {isAnalyzing ? (
             <div className="flex flex-col items-center justify-center h-64">
               <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
@@ -45,14 +45,18 @@
     --sidebar-border: 95 40% 28%;
     --sidebar-ring: 33 100% 57%;
 
-    /* Custom tokens */
+    /* Enhanced custom tokens */
     --gradient-primary: linear-gradient(135deg, hsl(95 53% 21%), hsl(88 46% 35%));
     --gradient-hero: linear-gradient(180deg, hsl(95 53% 21%) 0%, hsl(88 46% 40%) 50%, hsl(85 20% 97%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(85 20% 97%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(33 100% 57%), hsl(28 100% 50%));
+    --gradient-mesh: radial-gradient(at 40% 20%, hsl(88 46% 53% / 0.3) 0px, transparent 50%),
+                     radial-gradient(at 80% 0%, hsl(33 100% 57% / 0.2) 0px, transparent 50%),
+                     radial-gradient(at 0% 50%, hsl(95 53% 21% / 0.2) 0px, transparent 50%);
     --shadow-card: 0 4px 20px -4px hsl(95 53% 21% / 0.1);
     --shadow-elevated: 0 10px 40px -10px hsl(95 53% 21% / 0.2);
     --shadow-glow: 0 0 30px hsl(33 100% 57% / 0.3);
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
   }
 
   .dark {
@@ -127,6 +131,18 @@
     background: var(--gradient-primary);
   }
 
+  .mesh-gradient {
+    background: var(--gradient-mesh);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: var(--shadow-glass);
+  }
+
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
@@ -150,6 +166,18 @@
 
   .animate-pulse-slow {
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
   }
 }
 
@@ -175,3 +203,50 @@
     transform: translateY(-10px);
   }
 }
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, select, textarea {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced hover effects */
+.hover-lift {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
